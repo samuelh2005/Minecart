@@ -1,4 +1,4 @@
-#include "minecart/resource/ResourceLoader.hpp"
+#include "minecart/resource/FileSystemResourceLoader.hpp"
 #include "minecart/Panic.hpp"
 
 #include <algorithm>
@@ -34,27 +34,27 @@ std::string joinPathComponents(const fs::path& p) {
 
 } // namespace
 
-ResourceLoader::ResourceLoader(ResourceManager& manager)
+FileSystemResourceLoader::FileSystemResourceLoader(ResourceManager& manager)
     : manager_(manager) {}
 
-bool ResourceLoader::isDatapackRoot(const fs::path& packRoot) {
+bool FileSystemResourceLoader::isDatapackRoot(const fs::path& packRoot) {
     const bool exists = fs::exists(packRoot / "data") && fs::is_directory(packRoot / "data");
-    spdlog::debug("[ResourceLoader] isDatapackRoot root='{}' -> {}", packRoot.string(), exists);
+    spdlog::debug("[FileSystemResourceLoader] isDatapackRoot root='{}' -> {}", packRoot.string(), exists);
     return exists;
 }
 
-std::optional<ParsedDatapackPath> ResourceLoader::parseFile(const fs::path& packRoot,
+std::optional<ParsedDatapackPath> FileSystemResourceLoader::parseFile(const fs::path& packRoot,
                                                             const fs::path& file) {
     const fs::path dataRoot = packRoot / "data";
     if (!fs::exists(dataRoot) || !fs::is_directory(dataRoot)) {
-        spdlog::debug("[ResourceLoader] parseFile skip file='{}' reason=no data dir", file.string());
+        spdlog::debug("[FileSystemResourceLoader] parseFile skip file='{}' reason=no data dir", file.string());
         return std::nullopt;
     }
 
     std::error_code ec;
     fs::path rel = fs::relative(file, dataRoot, ec);
     if (ec || rel.empty()) {
-        spdlog::debug("[ResourceLoader] parseFile skip file='{}' reason=not relative", file.string());
+        spdlog::debug("[FileSystemResourceLoader] parseFile skip file='{}' reason=not relative", file.string());
         return std::nullopt;
     }
 
@@ -67,7 +67,7 @@ std::optional<ParsedDatapackPath> ResourceLoader::parseFile(const fs::path& pack
     }
 
     if (parts.size() < 3) {
-        spdlog::debug("[ResourceLoader] parseFile skip file='{}' reason=too few parts", file.string());
+        spdlog::debug("[FileSystemResourceLoader] parseFile skip file='{}' reason=too few parts", file.string());
         return std::nullopt;
     }
 
@@ -84,19 +84,19 @@ std::optional<ParsedDatapackPath> ResourceLoader::parseFile(const fs::path& pack
     out.file = file;
 
     if (out.key.namespace_.empty() || out.registry.empty() || out.key.path.empty()) {
-        spdlog::debug("[ResourceLoader] parseFile skip file='{}' reason=empty key", file.string());
+        spdlog::debug("[FileSystemResourceLoader] parseFile skip file='{}' reason=empty key", file.string());
         return std::nullopt;
     }
 
-    spdlog::debug("[ResourceLoader] parseFile ok file='{}' registry='{}' key={}",
+    spdlog::debug("[FileSystemResourceLoader] parseFile ok file='{}' registry='{}' key={}",
                  file.string(), out.registry, out.key.toString());
     return out;
 }
 
-std::vector<ParsedDatapackPath> ResourceLoader::scanDataDirectory(const fs::path& dataRoot) {
+std::vector<ParsedDatapackPath> FileSystemResourceLoader::scanDataDirectory(const fs::path& dataRoot) {
     std::vector<ParsedDatapackPath> discovered;
     if (!fs::exists(dataRoot) || !fs::is_directory(dataRoot)) {
-        spdlog::error("[ResourceLoader] scanDataDirectory invalid pack: missing data dir='{}'", dataRoot.string());
+        spdlog::error("[FileSystemResourceLoader] scanDataDirectory invalid pack: missing data dir='{}'", dataRoot.string());
         minecart::panic("Resource pack missing data directory: " + dataRoot.string());
     }
 
@@ -104,7 +104,7 @@ std::vector<ParsedDatapackPath> ResourceLoader::scanDataDirectory(const fs::path
     std::size_t namespace_dirs = 0;
     for (const auto& nsEntry : fs::directory_iterator(dataRoot)) {
         if (!nsEntry.is_directory()) {
-            spdlog::debug("[ResourceLoader] scanDataDirectory skip path='{}' reason=not namespace dir",
+            spdlog::debug("[FileSystemResourceLoader] scanDataDirectory skip path='{}' reason=not namespace dir",
                           nsEntry.path().string());
             continue;
         }
@@ -112,54 +112,54 @@ std::vector<ParsedDatapackPath> ResourceLoader::scanDataDirectory(const fs::path
 
         for (const auto& regEntry : fs::directory_iterator(nsEntry.path())) {
             if (!regEntry.is_directory()) {
-                spdlog::debug("[ResourceLoader] scanDataDirectory skip path='{}' reason=not registry dir",
+                spdlog::debug("[FileSystemResourceLoader] scanDataDirectory skip path='{}' reason=not registry dir",
                               regEntry.path().string());
                 continue;
             }
 
             for (const auto& entry : fs::recursive_directory_iterator(regEntry.path())) {
                 if (!entry.is_regular_file()) {
-                    spdlog::debug("[ResourceLoader] scanDataDirectory skip path='{}' reason=not file",
+                    spdlog::debug("[FileSystemResourceLoader] scanDataDirectory skip path='{}' reason=not file",
                                   entry.path().string());
                     continue;
                 }
-                spdlog::info("[ResourceLoader] scanDataDirectory attempt file='{}'", entry.path().string());
+                spdlog::info("[FileSystemResourceLoader] scanDataDirectory attempt file='{}'", entry.path().string());
                 auto parsed = parseFile(packRoot, entry.path());
                 if (!parsed) {
-                    spdlog::error("[ResourceLoader] invalid resource path='{}'", entry.path().string());
+                    spdlog::error("[FileSystemResourceLoader] invalid resource path='{}'", entry.path().string());
                     minecart::panic("Invalid resource path: " + entry.path().string());
                 }
                 discovered.push_back(std::move(*parsed));
             }
         }
     }
-    spdlog::debug("[ResourceLoader] scanDataDirectory done dir='{}' count={}",
+    spdlog::debug("[FileSystemResourceLoader] scanDataDirectory done dir='{}' count={}",
                  dataRoot.string(), discovered.size());
 
     if (namespace_dirs == 0) {
-        spdlog::error("[ResourceLoader] invalid pack: no namespace directories found in '{}'", dataRoot.string());
+        spdlog::error("[FileSystemResourceLoader] invalid pack: no namespace directories found in '{}'", dataRoot.string());
         minecart::panic("Resource pack missing namespace directories under: " + dataRoot.string());
     }
     return discovered;
 }
 
-std::vector<ParsedDatapackPath> ResourceLoader::scan(const fs::path& packRoot) {
+std::vector<ParsedDatapackPath> FileSystemResourceLoader::scan(const fs::path& packRoot) {
     return scanDataDirectory(packRoot / "data");
 }
 
-void ResourceLoader::loadPack(const fs::path& packRoot) {
+void FileSystemResourceLoader::loadPack(const fs::path& packRoot) {
     const fs::path dataRoot = packRoot / "data";
-    spdlog::info("[ResourceLoader] loadPack root='{}'", packRoot.string());
+    spdlog::info("[FileSystemResourceLoader] loadPack root='{}'", packRoot.string());
 
     if (!fs::exists(dataRoot) || !fs::is_directory(dataRoot)) {
-        spdlog::error("[ResourceLoader] loadPack invalid pack: missing data dir='{}'", dataRoot.string());
+        spdlog::error("[FileSystemResourceLoader] loadPack invalid pack: missing data dir='{}'", dataRoot.string());
         minecart::panic("Resource pack missing data directory: " + dataRoot.string());
     }
 
     std::size_t namespace_dirs = 0;
     for (const auto& nsEntry : fs::directory_iterator(dataRoot)) {
         if (!nsEntry.is_directory()) {
-            spdlog::error("[ResourceLoader] invalid pack: non-namespace entry='{}'", nsEntry.path().string());
+            spdlog::error("[FileSystemResourceLoader] invalid pack: non-namespace entry='{}'", nsEntry.path().string());
             minecart::panic("Invalid entry in data directory: " + nsEntry.path().string());
         }
 
@@ -180,39 +180,39 @@ void ResourceLoader::loadPack(const fs::path& packRoot) {
             hasRegistryDir = true;
             const std::string registryName = regEntry.path().filename().string();
             if (!manager_.hasRegistry(registryName)) {
-                spdlog::error("[ResourceLoader] invalid registry dir='{}'", regEntry.path().string());
+                spdlog::error("[FileSystemResourceLoader] invalid registry dir='{}'", regEntry.path().string());
                 minecart::panic("Invalid registry directory: " + regEntry.path().string());
             }
         }
 
         if (!hasRegistryDir) {
-            spdlog::error("[ResourceLoader] invalid pack: namespace '{}' has no registry dirs",
+            spdlog::error("[FileSystemResourceLoader] invalid pack: namespace '{}' has no registry dirs",
                           nsEntry.path().string());
             minecart::panic("Namespace missing registry directories: " + nsEntry.path().string());
         }
 
         if (hasLooseFile) {
-            spdlog::error("[ResourceLoader] invalid pack: namespace '{}' has files directly under it",
+            spdlog::error("[FileSystemResourceLoader] invalid pack: namespace '{}' has files directly under it",
                           nsEntry.path().string());
             minecart::panic("Namespace has loose files: " + nsEntry.path().string());
         }
     }
     if (namespace_dirs == 0) {
-        spdlog::error("[ResourceLoader] invalid pack: no namespace directories found in '{}'", dataRoot.string());
+        spdlog::error("[FileSystemResourceLoader] invalid pack: no namespace directories found in '{}'", dataRoot.string());
         minecart::panic("Resource pack missing namespace directories under: " + dataRoot.string());
     }
 
     auto discovered = scanDataDirectory(dataRoot);
     for (const auto& entry : discovered) {
-        spdlog::info("[ResourceLoader] dispatch registry='{}' key={} file={}",
+        spdlog::info("[FileSystemResourceLoader] dispatch registry='{}' key={} file={}",
                      entry.registry, entry.key.toString(), entry.file.string());
         const bool dispatched = manager_.dispatch(entry.registry, entry.key, entry.file);
         if (!dispatched) {
-            spdlog::warn("[ResourceLoader] no registry registry='{}' file='{}'",
+            spdlog::warn("[FileSystemResourceLoader] no registry registry='{}' file='{}'",
                         entry.registry, entry.file.string());
         }
     }
-    spdlog::info("[ResourceLoader] loadPack complete root='{}'", packRoot.string());
+    spdlog::info("[FileSystemResourceLoader] loadPack complete root='{}'", packRoot.string());
 }
 
 } // namespace minecart::resource

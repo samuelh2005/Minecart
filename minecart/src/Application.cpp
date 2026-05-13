@@ -1,5 +1,5 @@
 #include "minecart/Application.hpp"
-#include "minecart/resource/ResourceLoader.hpp"
+#include "minecart/resource/FileSystemResourceLoader.hpp"
 
 #include <chrono>
 #include <thread>
@@ -68,7 +68,7 @@ void HeadlessEntrypoint::onInit() {
     onServerInit();
 
     // load packs after user init, so that they can add their own registries if needed
-    minecart::resource::ResourceLoader loader(this->GetResourceManager());
+    minecart::resource::FileSystemResourceLoader loader(this->GetResourceManager());
     loader.loadPack(config_.assetsPath);
 }
 
@@ -100,7 +100,7 @@ void GraphicalEntrypoint::onInit() {
     onClientInit();
 
     // load packs after user init, so that they can add their own registries if needed
-    minecart::resource::ResourceLoader loader(this->GetResourceManager());
+    minecart::resource::FileSystemResourceLoader loader(this->GetResourceManager());
     loader.loadPack(config_.assetsPath);
 }
 

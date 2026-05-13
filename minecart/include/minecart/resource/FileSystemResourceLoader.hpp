@@ -9,9 +9,9 @@
 
 namespace minecart::resource {
 
-class ResourceLoader {
+class FileSystemResourceLoader {
 public:
-    explicit ResourceLoader(ResourceManager& manager);
+    explicit FileSystemResourceLoader(ResourceManager& manager);
 
     void loadPack(const std::filesystem::path& packRoot);
 
