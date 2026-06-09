@@ -2,6 +2,7 @@ add_library(minecart
     src/Application.cpp
     src/JsonResource.cpp
     src/FileSystemResourceLoader.cpp
+    src/ResourceKey.cpp
     src/ResourceManager.cpp
     src/Localisation.cpp
     src/Window.cpp
