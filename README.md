@@ -140,3 +140,9 @@ closed.
 - To let two windows *share* the same `Renderer` instance (rather than two
   separate instances of the same class), change `Window` to hold a
   `std::shared_ptr<Renderer>` instead of `std::unique_ptr<Renderer>`.
+
+## License
+
+The engine is licensed under the [Polyform Perimeter License 1.0.1](./LICENSE-ENGINE). Examples are licensed under the [MIT License](./LICENSE-EXAMPLES). See the respective LICENSE files for details.
+
+> Required Notice: Copyright Samuel Hulme. (https://github.com/samuelh2005)
