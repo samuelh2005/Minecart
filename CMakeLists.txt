@@ -14,3 +14,4 @@ add_subdirectory(engine)
 # Concrete applications live under examples/. Each one implements its own
 # Application subclass (onInit/onEvent/onTick) and its own Renderer(s).
 add_subdirectory(examples/color_demo)
+add_subdirectory(examples/window_pong)
