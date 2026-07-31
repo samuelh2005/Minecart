@@ -54,7 +54,7 @@ protected:
     // its SDL_WindowID. Exposed to derived classes so they can build their
     // windows from onInit().
     SDL_WindowID createWindow(const std::string& title, int width, int height,
-                               std::unique_ptr<Renderer> renderer);
+                               std::shared_ptr<Renderer> renderer);
 
     // The shared GPU device, in case a derived class needs it directly (e.g.
     // to create GPU resources beyond what Window itself manages).

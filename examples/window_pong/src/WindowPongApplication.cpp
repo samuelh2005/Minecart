@@ -32,21 +32,21 @@ void WindowPongApplication::onInit() {
     m_player1Window = createWindow(
         "Player 1",
         player1Rect.w, player1Rect.h,
-        std::make_unique<ClearColorRenderer>(SDL_FColor{0.60f, 0.10f, 0.10f, 1.0f})
+        std::make_shared<ClearColorRenderer>(SDL_FColor{0.60f, 0.10f, 0.10f, 1.0f})
     );
     SDL_SetWindowPosition(SDL_GetWindowFromID(m_player1Window), player1Rect.x, player1Rect.y);
 
     m_player2Window = createWindow(
         "Player 2",
         player2Rect.w, player2Rect.h,
-        std::make_unique<ClearColorRenderer>(SDL_FColor{0.10f, 0.60f, 0.10f, 1.0f})
+        std::make_shared<ClearColorRenderer>(SDL_FColor{0.10f, 0.60f, 0.10f, 1.0f})
     );
     SDL_SetWindowPosition(SDL_GetWindowFromID(m_player2Window), player2Rect.x, player2Rect.y);
 
     m_ballWindow = createWindow(
         "Ball",
         ballRect.w, ballRect.h,
-        std::make_unique<ClearColorRenderer>(SDL_FColor{1.1f, 1.1f, 1.0f, 1.0f})
+        std::make_shared<ClearColorRenderer>(SDL_FColor{1.1f, 1.1f, 1.0f, 1.0f})
     );
     SDL_SetWindowPosition(SDL_GetWindowFromID(m_ballWindow), ballRect.x, ballRect.y);
 }

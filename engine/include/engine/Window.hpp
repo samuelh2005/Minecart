@@ -17,7 +17,7 @@
 class Window {
 public:
     Window(SDL_GPUDevice* device, const std::string& title, int width, int height,
-           std::unique_ptr<Renderer> renderer);
+           std::shared_ptr<Renderer> renderer);
     ~Window();
 
     Window(const Window&) = delete;
@@ -39,6 +39,6 @@ private:
 
     SDL_GPUDevice* m_device = nullptr;
     SDL_Window* m_window = nullptr;
-    std::unique_ptr<Renderer> m_renderer;
+    std::shared_ptr<Renderer> m_renderer;
     bool m_wantsClose = false;
 };

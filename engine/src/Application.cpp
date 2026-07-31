@@ -35,7 +35,7 @@ Application::~Application() {
 }
 
 SDL_WindowID Application::createWindow(const std::string& title, int width, int height,
-                                        std::unique_ptr<Renderer> renderer) {
+                                        std::shared_ptr<Renderer> renderer) {
     auto window = std::make_unique<Window>(m_device, title, width, height, std::move(renderer));
     const SDL_WindowID id = window->id();
     m_windows.push_back(std::move(window));

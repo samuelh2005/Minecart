@@ -4,7 +4,7 @@
 #include <utility>
 
 Window::Window(SDL_GPUDevice* device, const std::string& title, int width, int height,
-               std::unique_ptr<Renderer> renderer)
+               std::shared_ptr<Renderer> renderer)
     : m_device(device), m_renderer(std::move(renderer)) {
     m_window = SDL_CreateWindow(title.c_str(), width, height, 0);
     if (!m_window) {
