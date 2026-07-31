@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(MINECART_EXAMPLES ON CACHE BOOL "Build the example applications")
+SET(MINECART_SDL_REPO "https://github.com/libsdl-org/SDL.git" CACHE STRING "SDL3 repository to use for builds")
+SET(MINECART_SDL_RELEASE "release-3.4.12" CACHE STRING "SDL3 release tag to use for builds")
 
 # The engine owns SDL3, the Window/Renderer abstractions, and the abstract
 # Application. Everything under examples/ links against it rather than

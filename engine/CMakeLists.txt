@@ -14,8 +14,8 @@ set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 # purpose.
 FetchContent_Declare(
     SDL3
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG release-3.4.12
+    GIT_REPOSITORY ${MINECART_SDL_REPO}
+    GIT_TAG ${MINECART_SDL_RELEASE}
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
 )
