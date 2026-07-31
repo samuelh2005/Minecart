@@ -24,20 +24,20 @@ FetchContent_MakeAvailable(SDL3)
 # The engine: SDL3, Windows, the Renderer abstraction, and the abstract
 # Application. Concrete applications (see examples/) link against this and
 # never touch SDL3 directly.
-add_library(engine STATIC
+add_library(Minecart STATIC
     src/Application.cpp
     src/Window.cpp
 )
 
-target_include_directories(engine PUBLIC include)
+target_include_directories(Minecart PUBLIC include)
 
 # SDL's CMake exports SDL3::SDL3 as an ALIAS for whichever of the
 # static/shared targets is enabled -- with SDL_SHARED=OFF above, that is the
 # static library, so this single link line works whether SDL3::SDL3 resolves
 # to SDL3-static or SDL3-shared. PUBLIC because engine's own public headers
 # (Application.hpp, Window.hpp, Renderer.hpp) include <SDL3/SDL.h>.
-target_link_libraries(engine PUBLIC SDL3::SDL3)
+target_link_libraries(Minecart PUBLIC SDL3::SDL3)
 
 if(APPLE)
-    target_link_libraries(engine PUBLIC "-framework Metal" "-framework QuartzCore")
+    target_link_libraries(Minecart PUBLIC "-framework Metal" "-framework QuartzCore")
 endif()

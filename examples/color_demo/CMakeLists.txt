@@ -9,4 +9,4 @@ add_executable(color_demo
 
 target_include_directories(color_demo PRIVATE src)
 
-target_link_libraries(color_demo PRIVATE engine)
+target_link_libraries(color_demo PRIVATE Minecart)

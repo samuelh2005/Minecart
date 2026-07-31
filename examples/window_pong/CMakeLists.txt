@@ -6,4 +6,4 @@ add_executable(window_pong
 
 target_include_directories(window_pong PRIVATE src)
 
-target_link_libraries(window_pong PRIVATE engine)
+target_link_libraries(window_pong PRIVATE Minecart)
